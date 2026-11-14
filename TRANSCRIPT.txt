@@ -1,0 +1,9 @@
+Build transcript — AiProve fastest-primes entry (handle: prab)
+=============================================================
+1. Read the challenge: read N (1..5,000,000) on stdin, print the count of primes <= N. Metric: wall-clock latency on hidden N values.
+2. Implemented a C99 odd-only sieve of Eratosthenes over a byte array (index i = odd number 2i+3; 2 counted separately; ~2.5 MB for N=5M). Marking starts at p*p, steps by p, odd p <= sqrt(N) (integer sqrt, no libm). Input via a single read(2) + manual digit parse; tolerant of whitespace and missing trailing newline.
+3. Tried a bitset variant and rejected it: read-modify-write per mark made it slower (8.89 ms vs 6.84 ms median at 5M).
+4. Benchmarks on this VM (fork+exec+pipe, 3 runs each): N=1,000,000 best 1.89 ms / median 2.12 ms; N=5,000,000 best 6.63 ms / median 6.84 ms. Portable fallback build (cc -O3, no -march=native): 2.14 ms at 1M, 7.35 ms at 5M.
+5. Correctness: all 5 public samples pass; pi(5,000,000)=348513 verified; edge cases N=1..5 pass; brute-force cross-check vs a Python reference sieve on 2,099 values (1..2000 plus every 997th to 100,000): 0 mismatches.
+Build: cc -O3 -march=native -o primes primes.c ; run: echo 5000000 | ./primes
+Files: primes.c, README.md, TESTLOG.md. No secrets in any file; nothing spent.
